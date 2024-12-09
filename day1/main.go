@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"math"
 	"os"
 	"slices"
 	"strconv"
@@ -13,48 +12,67 @@ var input, _ = os.ReadFile("./input")
 
 func main() {
 
+	var left []int
+	var right []int
+
+	input = bytes.ReplaceAll(input, []byte("\n"), []byte(" "))
+	inputMatrix := bytes.Split(input, []byte(" "))
+
+	intList := convInt(inputMatrix)
+
+	left, right = splitInput(intList)
+
+	sortNums(left)
+	sortNums(right)
+
+	//fmt.Printf("Left:\n %d\n\n", left)
+	//fmt.Printf("Right:\n %d\n\n", right)
+	fmt.Printf("The distance between the two lists is: %d\n", solve(left, right))
+}
+
+func convInt(list [][]byte) []int {
 	var nums []int
 
-	func() {
-		input = bytes.ReplaceAll(input, []byte("\n"), []byte(" "))
-		inputMatrix := bytes.Split(input, []byte(" "))
-		for i := range inputMatrix {
-			num, _ := strconv.Atoi(string(inputMatrix[i]))
-			if num == 0 {
+	for i := range list {
+		var str string
+
+		for _, j := range list[i] {
+			if j == ' ' {
 				continue
-			} else {
-				nums = append(nums, num)
 			}
+			str += string(j)
+
 		}
-	}()
-
-	nums1, nums2 := sortNums(splitInput(nums))
-
-	//fmt.Printf("Nums1:\n %d\n\n", nums1)
-	//fmt.Printf("Nums2:\n %d\n\n", nums2)
-	fmt.Println(solve(nums1, nums2))
-
+		num, _ := strconv.Atoi(str)
+		if num == 0 {
+			continue
+		}
+		nums = append(nums, num)
+	}
+	return nums
 }
 
 func splitInput(nums []int) ([]int, []int) {
 	var nums1, nums2 []int
 
-	for i := 0; i < len(nums)-2; i += 2 {
+	for i, j := 0, 1; j < len(nums); {
 		nums1 = append(nums1, nums[i])
-		nums2 = append(nums2, nums[i+1])
+		nums2 = append(nums2, nums[j])
+		i += 2
+		j += 2
+
 	}
 
 	return nums1, nums2
 }
 
-func sortNums(nums1, nums2 []int) ([]int, []int) {
-	slices.Sort(nums1)
-	slices.Sort(nums2)
-	return nums1, nums2
+func sortNums(nums []int) []int {
+	slices.Sort(nums)
+	return nums
 }
 
-func solve(nums1, nums2 []int) float64 {
-	var accum float64
+func solve(nums1, nums2 []int) int {
+	var accum int
 
 	for i := range nums1 {
 
@@ -63,7 +81,7 @@ func solve(nums1, nums2 []int) float64 {
 		if a == b {
 			continue
 		} else {
-			accum += math.Abs(float64(diff(a, b)))
+			accum += diff(a, b)
 		}
 	}
 	return accum
