@@ -8,24 +8,28 @@ import (
 	"strconv"
 )
 
-var input, _ = os.ReadFile("./input2")
+var input, _ = os.ReadFile("./input4")
 
 func main() {
 
 	var left []int
 	var right []int
 
+	//input replace not pulling in all inputs
 	input = bytes.ReplaceAll(input, []byte("\n"), []byte(" "))
+	for i := range input {
+		fmt.Println(string(input[i]))
+	}
+	//fmt.Println("Input", input)
 
-	fmt.Println("Input", input)
-
+	//input split is not splitting properly, only getting left list
 	inputMatrix := bytes.Split(input, []byte(" "))
 
-	fmt.Println("InputMatrix", inputMatrix)
+	//fmt.Println("InputMatrix", inputMatrix)
 
 	intList := convInt(inputMatrix)
 
-	fmt.Println("IntList", intList)
+	//fmt.Println("IntList", intList)
 
 	left, right = splitInput(intList)
 	//sortNums(left)
