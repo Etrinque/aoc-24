@@ -8,48 +8,34 @@ import (
 	"strconv"
 )
 
-var input, _ = os.ReadFile("./input4")
+var input, _ = os.ReadFile("./input")
 
 func main() {
 
 	var left []int
 	var right []int
 
-	//input replace not pulling in all inputs
-	input = bytes.ReplaceAll(input, []byte("\n"), []byte(" "))
-	for i := range input {
-		fmt.Println(string(input[i]))
-	}
-	//fmt.Println("Input", input)
-
-	//input split is not splitting properly, only getting left list
-	inputMatrix := bytes.Split(input, []byte(" "))
-
-	//fmt.Println("InputMatrix", inputMatrix)
+	inputMatrix := bytes.Fields(input)
 
 	intList := convInt(inputMatrix)
 
-	//fmt.Println("IntList", intList)
-
 	left, right = splitInput(intList)
-	//sortNums(left)
-	//sortNums(right)
-	fmt.Printf("Left:\n %d\n\n", left)
-	fmt.Printf("Right:\n %d\n\n", right)
 
-	//fmt.Printf("The distance between the two lists is: %d\n", solve(left, right))
-	//fmt.Printf("The similarity score is: %d", calcSimScore(left, right))
+	sortNums(left)
+	sortNums(right)
+
+	fmt.Printf("Length Left:\t%d\n\n", len(left))
+	fmt.Printf("Length Right:\t%d\n\n", len(right))
+	fmt.Printf("The distance between the two lists is: %d\n", solve(left, right))
+	fmt.Printf("The similarity score is: %d", calcSimScore(left, right))
 
 }
 
 func convInt(list [][]byte) []int {
 	var nums []int
-	//var numsList [][]int
-	fmt.Printf("List Length: %d\n", len(list))
 
 	for _, i := range list {
 		var str string
-
 		if i == nil {
 			continue
 		}
@@ -73,10 +59,8 @@ func convInt(list [][]byte) []int {
 }
 
 func splitInput(nums []int) ([]int, []int) {
-
 	var nums1, nums2 []int
-
-	for i, j := 0, 1; j < len(nums)-1; {
+	for i, j := 0, 1; j < len(nums); {
 		nums1 = append(nums1, nums[i])
 		nums2 = append(nums2, nums[j])
 		i += 2
@@ -94,9 +78,7 @@ func sortNums(nums []int) []int {
 
 func solve(nums1, nums2 []int) int {
 	var accum int
-
 	for i := range nums1 {
-
 		a := nums1[i]
 		b := nums2[i]
 		if a == b {
@@ -140,7 +122,7 @@ func calcSimScore(nums1, nums2 []int) int {
 		if count > 0 {
 			accum += count * nums1[i]
 		} else {
-			accum += nums1[i]
+			continue
 		}
 	}
 	return accum
