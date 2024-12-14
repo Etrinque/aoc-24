@@ -11,60 +11,75 @@ var input, _ = os.ReadFile("./input")
 
 func main() {
 
-	func() {
-		inputMatrix := bytes.Split(input, []byte("\n"))
-		//fmt.Printf("InputMatrix: %v", inputMatrix)
+	inputMatrix := bytes.Split(input, []byte("\n"))
 
-		matrix, _ := convertBytesToInts(inputMatrix)
-		fmt.Printf("Int Matrix: %v", matrix)
+	var safeCount int
+	var safe bool
 
-	}()
-}
+	for i := 0; i < len(inputMatrix); i++ {
+		var integer []int
 
-/*func convToInt(arr [][]string) [][]int {
+		//fmt.Printf("InputMatrix: %v\n", inputMatrix[i])
+		str := bytes.Split(inputMatrix[i], []byte(" "))
 
-	return nil
-}*/
+		for j := 0; j < len(str); j++ {
 
-/*func convInt(list [][]byte) [][]int {
-	var nums []int
-	var matrix [][]int
+			num, _ := strconv.Atoi(string(str[j]))
+			integer = append(integer, num)
 
-	for _, i := range list {
-		var str string
-		if i == nil {
+		}
+
+		if len(integer) < 1 {
 			continue
 		}
 
-		for _, j := range i {
-			if j == byte(' ') || j == 32 {
-				continue
+		if isAscend(integer) || isDescend(integer) {
+			if isSafe(integer) {
+				safeCount++
+				safe = true
 			}
-			str += string(j)
-
-			num, _ := strconv.Atoi(str)
-			nums = append(nums, num)
 		}
 
-		matrix = append(matrix, nums)
+		//fmt.Printf("String: %v\n", str)
+		fmt.Printf("Integer: %v\n", integer)
+		fmt.Printf("SafeCount: %v\n", safeCount)
+		fmt.Printf("Safe: %v\n", safe)
 	}
-	return matrix
-}*/
+}
 
-func convertBytesToInts(byteSlices [][]byte) ([][]int, error) {
-	var result [][]int
+// The levels are either all increasing or all decreasing.
+// Any two adjacent levels differ by at least one and at most three.
 
-	for i, slice := range byteSlices {
-		for _, b := range slice {
-			// Convert byte to string, then to int
-			strVal := string(b)
-			intVal, err := strconv.Atoi(strVal)
-			if err != nil {
-				return nil, err // Handle error if conversion fails
-			}
-			result[i] = append(result[i], intVal)
+func isAscend(list []int) bool {
+	for i := 0; i < len(list)-1; i++ {
+		if list[i] > list[i+1] {
+			return false
 		}
 	}
+	return true
+}
 
-	return result, nil
+func isDescend(list []int) bool {
+	for i := 0; i < len(list)-1; i++ {
+		if list[i] < list[i+1] {
+			return false
+		}
+	}
+	return true
+}
+
+func isSafe(list []int) bool {
+	for i := 0; i < len(list)-1; i++ {
+		if diff(list[i], list[i+1]) > 3 || diff(list[i], list[i+1]) < 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func diff(a, b int) int {
+	if a > b {
+		return a - b
+	}
+	return b - a
 }
