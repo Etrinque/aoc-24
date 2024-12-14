@@ -1,48 +1,93 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
+	"os"
+	"slices"
 	"strconv"
 )
 
-const url = "https://adventofcode.com/2024/day/1/input"
+var input, _ = os.ReadFile("./input")
 
 func main() {
-	fmt.Println("Hello, AOC!")
-	var client = http.DefaultClient
 
-	resp, err := client.Get(url)
-	if err != nil {
-		log.Fatalf("Failure to make request: %v", err)
+	var left []int
+	var right []int
+
+	inputMatrix := bytes.Fields(input)
+
+	intList := convInt(inputMatrix)
+
+	left, right = splitInput(intList)
+
+	sortNums(left)
+	sortNums(right)
+
+	fmt.Printf("Length Left:\t%d\n\n", len(left))
+	fmt.Printf("Length Right:\t%d\n\n", len(right))
+	fmt.Printf("The distance between the two lists is: %d\n", solve(left, right))
+	fmt.Printf("The similarity score is: %d", calcSimScore(left, right))
+
+}
+
+func convInt(list [][]byte) []int {
+	var nums []int
+
+	for _, i := range list {
+		var str string
+		if i == nil {
+			continue
+		}
+
+		for _, j := range i {
+			if j == byte(' ') {
+				continue
+			}
+			str += string(j)
+
+		}
+
+		num, _ := strconv.Atoi(str)
+		if num == 0 {
+			continue
+		}
+
+		nums = append(nums, num)
+	}
+	return nums
+}
+
+func splitInput(nums []int) ([]int, []int) {
+	var nums1, nums2 []int
+	for i, j := 0, 1; j < len(nums); {
+		nums1 = append(nums1, nums[i])
+		nums2 = append(nums2, nums[j])
+		i += 2
+		j += 2
+
 	}
 
-	defer resp.Body.Close()
+	return nums1, nums2
+}
 
-	buf, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Failed to read body: %v", err)
-	}
-	fmt.Printf("Buffer length: %d", len(buf))
+func sortNums(nums []int) []int {
+	slices.Sort(nums)
+	return nums
+}
 
+func solve(nums1, nums2 []int) int {
 	var accum int
-
-	for i, j := 0, 1; j < len(buf); {
-
-		var a, _ = strconv.Atoi(string(buf[i]))
-		var b, _ = strconv.Atoi(string(buf[j]))
-
-		fmt.Printf("A: %d", a)
-		fmt.Printf("B: %d", b)
-
-		accum += diff(a, b)
-		i++
-		j++
+	for i := range nums1 {
+		a := nums1[i]
+		b := nums2[i]
+		if a == b {
+			continue
+		} else {
+			accum += diff(a, b)
+		}
 	}
-
-	fmt.Println(accum)
+	return accum
 }
 
 func diff(a, b int) int {
@@ -50,4 +95,35 @@ func diff(a, b int) int {
 		return a - b
 	}
 	return b - a
+}
+
+/*
+PART 2:
+
+This time, you'll need to figure out exactly how often each number from the left list appears in the right list.
+Calculate a total similarity score by adding up each number in the left list
+after multiplying it by the number of times that number appears in the right list.
+
+*/
+
+func calcSimScore(nums1, nums2 []int) int {
+	// naive solution. could be done with map
+	var accum int
+
+	for i := range nums1 {
+		var count int
+		for j := range nums2 {
+			if nums1[i] == nums2[j] {
+				count += 1
+			} else {
+				continue
+			}
+		}
+		if count > 0 {
+			accum += count * nums1[i]
+		} else {
+			continue
+		}
+	}
+	return accum
 }
