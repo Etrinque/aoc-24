@@ -100,7 +100,7 @@ func dampenerTolerance(list []int) bool {
 
 	// need to flag or count if index was dropped and list is now safe
 	// only 1 allowed index drop to validate safety else returns unsafe
-	var count int
+	//var count int
 
 	fmt.Printf("Dampener List: %v\n", list)
 	for i := 0; i < len(list)-1; i++ {
