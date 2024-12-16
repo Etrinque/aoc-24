@@ -5,10 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 )
 
-var input, _ = os.ReadFile("./input2")
+var input, _ = os.ReadFile("./input")
 var dampener = flag.Bool("dampener", false, "dampener active")
 
 func main() {
@@ -16,7 +17,6 @@ func main() {
 	inputMatrix := bytes.Split(input, []byte("\n"))
 
 	var safeCount int
-	var safe bool
 
 	for i := 0; i < len(inputMatrix); i++ {
 		var integer []int
@@ -34,28 +34,20 @@ func main() {
 			continue
 		}
 
-		if isAscend(integer) || isDescend(integer) && isSafe(integer) {
+		if isAscend(integer) && isSafe(integer) || isDescend(integer) && isSafe(integer) {
 			safeCount++
-			safe = true
-		} else if dampenerTolerance(integer) && isSafe(integer) || isDescend(integer) {
+		} else if dampenerTolerance(i, integer) {
 			safeCount++
-			safe = true
-		} else {
-			safe = false
 		}
 
-		//fmt.Printf("Integer: %v\n", integer)
-		fmt.Printf("List %d: | isSafe: %v\n", i, safe)
 	}
 	fmt.Printf("SafeCount: %v\n", safeCount)
 }
 
 /*
-The levels are either all increasing or all decreasing.
-Any two adjacent levels differ by at least one and at most three.
+Check sorted order, The levels are either all increasing or all decreasing.
 */
 
-// Helper Functions
 func isAscend(list []int) bool {
 	for i := 0; i < len(list)-1; i++ {
 		if list[i] > list[i+1] {
@@ -73,6 +65,10 @@ func isDescend(list []int) bool {
 	}
 	return true
 }
+
+/*
+Any two adjacent levels differ by at least one and at most three.
+*/
 
 func isSafe(list []int) bool {
 	for i := 0; i < len(list)-1; i++ {
@@ -94,32 +90,20 @@ func diff(a, b int) int {
 part 2
 if removing a single level from an unsafe report would make it safe,
 the report instead counts as safe.
+Boolean Flag activated from command line with arg  { -dampener=true }
 */
 
-func dampenerTolerance(list []int) bool {
+func dampenerTolerance(idx int, list []int) bool {
 	if !*dampener {
 		return false
 	}
 	var nums []int
 
-	// need to flag or count if index was dropped and list is now safe
-	// only 1 allowed index drop to validate safety else returns unsafe
-
-	//var count int
-	//fmt.Println("List:", list)
 	for i := 0; i < len(list); i++ {
 
-		nums = append(nums, list[:i]...)
-		//fmt.Printf("Nums pre: %d", nums)
+		nums = slices.Concat(list[:i], list[i+1:])
 
-		nums = append(nums, list[i+1:]...)
-		//fmt.Printf("Nums post: %d", nums)
-
-		//if len(nums) == len(list)-1 {
-		//	count += 1
-		//}
-
-		if isSafe(nums) {
+		if isAscend(nums) && isSafe(nums) || isDescend(nums) && isSafe(nums) {
 			return true
 		}
 	}
@@ -135,3 +119,9 @@ func dampenerTolerance(list []int) bool {
 // Fourth Run : 381 incorrect +/-?
 
 // Firth Run : 329 incorrect +/-?
+
+// Fifth Run : 524 Incorrect +/-?
+
+// Sixth Run : 515 Incorrect +/-?
+
+//  Seventh Run : 354 CORRECT!
