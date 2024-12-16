@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var input, _ = os.ReadFile("./input")
+var input, _ = os.ReadFile("./input2")
 var dampener = flag.Bool("dampener", false, "dampener active")
 
 func main() {
@@ -34,17 +34,20 @@ func main() {
 			continue
 		}
 
-		if isAscend(integer) || isDescend(integer) {
-			if isSafe(integer) || dampenerTolerance(integer) {
-				safeCount++
-				safe = true
-			}
+		if isAscend(integer) || isDescend(integer) && isSafe(integer) {
+			safeCount++
+			safe = true
+		} else if dampenerTolerance(integer) && isSafe(integer) || isDescend(integer) {
+			safeCount++
+			safe = true
+		} else {
+			safe = false
 		}
 
 		//fmt.Printf("Integer: %v\n", integer)
-		//fmt.Printf("SafeCount: %v\n", safeCount)
-		fmt.Printf("Safe: %v\n", safe)
+		fmt.Printf("List %d: | isSafe: %v\n", i, safe)
 	}
+	fmt.Printf("SafeCount: %v\n", safeCount)
 }
 
 /*
@@ -97,19 +100,24 @@ func dampenerTolerance(list []int) bool {
 	if !*dampener {
 		return false
 	}
+	var nums []int
 
 	// need to flag or count if index was dropped and list is now safe
 	// only 1 allowed index drop to validate safety else returns unsafe
+
 	//var count int
+	//fmt.Println("List:", list)
+	for i := 0; i < len(list); i++ {
 
-	fmt.Printf("Dampener List: %v\n", list)
-	for i := 0; i < len(list)-1; i++ {
+		nums = append(nums, list[:i]...)
+		//fmt.Printf("Nums pre: %d", nums)
 
-		nums := append([]int{}, list[:i]...)
-		fmt.Printf("Nums pre: %d", nums)
+		nums = append(nums, list[i+1:]...)
+		//fmt.Printf("Nums post: %d", nums)
 
-		nums = append(nums, list[:i+1]...)
-		fmt.Printf("Nums post: %d", nums)
+		//if len(nums) == len(list)-1 {
+		//	count += 1
+		//}
 
 		if isSafe(nums) {
 			return true
@@ -119,3 +127,11 @@ func dampenerTolerance(list []int) bool {
 }
 
 // First Run : 649 Too High
+
+// Second Run : 304 Too Low
+
+// Third Run: 326 Too Low
+
+// Fourth Run : 381 incorrect +/-?
+
+// Firth Run : 329 incorrect +/-?
