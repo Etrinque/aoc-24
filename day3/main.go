@@ -1,4 +1,4 @@
-package day3
+package main
 
 import (
 	"fmt"
@@ -27,15 +27,17 @@ var input, _ = os.ReadFile("./input")
 
 func main() {
 	var result int
-	var pair []int
-	var pairMatrix [][]int
+	//var pair []int
+	//var pairMatrix [][]int
 
-	pairMatrix = parseExp(input)
+	_ = parseExp(input)
 
-	for i := range pairMatrix {
-		pair = pairMatrix[i]
-		result += accumulate(pair[0], pair[1])
-	}
+	//fmt.Printf("PairMatrix: %v", pairMatrix)
+
+	//for i := 0; i < len(pairMatrix); i++ {
+	//	pair = pairMatrix[i]
+	//	result += accumulate(pair[0], pair[1])
+	//}
 
 	fmt.Printf("Result: %d\n", result)
 }
@@ -47,36 +49,45 @@ func isDigit(ch byte) bool {
 	return false
 }
 
-//func matchMul() bool {
-//	return false
-//}
-
 func accumulate(a, b int) int {
 	product := a * b
 	return product
 }
 
 func parseExp(input []byte) [][]int {
+	var window []byte
 	var matrix [][]int
 	var digits string
 	var num int
 	var pair []int
+	var mulCount = 0
 
-	for i := 0; i < len(input)-2; i++ {
+	for i := 0; i < len(input)-1; i++ {
+
+		window = input[i : i+3]
+
 		// parse the input for "mul" + "(" + digit/s + "," + digit/s + ")"
-		if string(input[i:i+2]) == "mul" && string(input[i+3]) == "(" {
 
+		if string(window) == "mul" {
+			mulCount++
+			fmt.Printf("Found: %s\t", string(window))
+			fmt.Println("MulCount\t", mulCount)
+
+			if !isDigit(input[i+4]) {
+				continue
+			}
+
+			digits += string(input[5])
+
+			//if string(input[i]) == ")" {
+			//	matrix = append(matrix, pair)
+			//}
 		}
 	}
-
-	// concat digits together
-	digits += input[i]
-
-	// convert digits to INT
-	num = strconv.Atoi(digits)
-
-	// append to matrix as pairs
+	num, _ = strconv.Atoi(digits)
 	pair = append(pair, num)
-	matrix = append(matrix, pair)
+	fmt.Printf("Pair Length: %d\t", len(pair))
+	// append to matrix as pairs
+
 	return matrix
 }
