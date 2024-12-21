@@ -27,17 +27,17 @@ var input, _ = os.ReadFile("./input")
 
 func main() {
 	var result int
-	//var pair []int
-	//var pairMatrix [][]int
+	var pair []int
+	var pairMatrix [][]int
 
 	_ = parseExp(input)
 
-	//fmt.Printf("PairMatrix: %v", pairMatrix)
+	fmt.Printf("PairMatrix: %v", pairMatrix)
 
-	//for i := 0; i < len(pairMatrix); i++ {
-	//	pair = pairMatrix[i]
-	//	result += accumulate(pair[0], pair[1])
-	//}
+	for i := 0; i < len(pairMatrix); i++ {
+		pair = pairMatrix[i]
+		result += accumulate(pair[0], pair[1])
+	}
 
 	fmt.Printf("Result: %d\n", result)
 }
@@ -71,21 +71,24 @@ func parseExp(input []byte) [][]int {
 		if string(window) == "mul" {
 			mulCount++
 			fmt.Printf("Found: %s\t", string(window))
-			fmt.Println("MulCount\t", mulCount)
+			fmt.Printf("MulCount: %d\t\n", mulCount)
 
-			if !isDigit(input[i+4]) {
-				continue
+			if input[i+4] == '(' {
+				if isDigit(input[i+5]) {
+					digits += string(input[5])
+				}
 			}
 
-			digits += string(input[5])
+			fmt.Printf("Digits: %s\t", digits)
 
 			//if string(input[i]) == ")" {
 			//	matrix = append(matrix, pair)
 			//}
+			num, _ = strconv.Atoi(digits)
+			pair = append(pair, num)
 		}
+
 	}
-	num, _ = strconv.Atoi(digits)
-	pair = append(pair, num)
 	fmt.Printf("Pair Length: %d\t", len(pair))
 	// append to matrix as pairs
 
